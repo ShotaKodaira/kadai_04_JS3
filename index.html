@@ -1,0 +1,112 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE風アプリ</title>
+</head>
+<body>
+<!-- コンテンツ表示画面 -->
+    <div>
+        <div> 名前：
+            <input type="text" id="uname"> </div>
+        <div>
+            <textarea id="text" cols="30" rows="10"></textarea>
+            <button id="send">送信</button>
+        </div>
+        <div id="output">
+            <!-- 登録されたデータを、JSで表示するエリアのこと -->
+        </div>
+    </div>
+<!--/ コンテンツ表示画面 -->
+
+<!-- JQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!-- JQuery -->
+
+<!-- Firebase -->
+
+
+<script type="module">
+    // Databaseをつくる
+
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-analytics.js";
+    // デフォルト「firebase-app.js」では最小限のコアライブラリのみ読み込んでします。新たに「firebase-database.js」を読み込みRealtimeDatabaseを使えるようにし、importで必要な機能を利用できるようにします!
+    import {
+        getDatabase,
+        ref,
+        push,
+        set,
+        onChildAdded,
+        remove,
+        onChildRemoved,
+    } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+      
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyDg8HeZqFaFOKBFIbslZ0evl0yH3nGgX3U",
+        authDomain: "gs23-45f48.firebaseapp.com",
+        databaseURL: "https://gs23-45f48-default-rtdb.firebaseio.com",
+        projectId: "gs23-45f48",
+        storageBucket: "gs23-45f48.appspot.com",
+        messagingSenderId: "686906352210",
+        appId: "1:686906352210:web:5dbb4e7cef211f3ed7758b",
+        measurementId: "G-002XFSY0W1"
+    };
+    // Initialize Firebase データの塊を書き換える
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);  //RealtimeDBに接続
+    const db  = getDatabase(app); //RealtimeDBに接続
+    const dbRef = ref(db, "chat"); //RealtimeDB内の"chat"を使う
+    // Databaseをつくる
+
+    // Jquely
+        // 送信のボタンが押されたらデータを登録する処理を書きます
+        $('#send').on("click",function(){
+            // alert(1)
+            const uname = $('#uname').val();
+            const text = $('#text').val();
+            // 必ず、入朝区されたものが取得できているか、コンソールログを使って確認！
+            
+            console.log(uname,'名前');
+            console.log(text,'テキスト');
+            // データの塊を作成します🤗
+            const msg = {
+                uname: uname,
+                text: text,
+            }
+
+            // firebaseにデータを送る処理
+            const newPostRef = push(dbRef);
+            set(newPostRef, msg);
+
+            // 入力欄を殻にする方法
+            $("uname").val(""); // 空にする
+            $("text:").val("");
+
+            // この下は消さない
+        });
+
+        // 受信処理を記述します🤗
+        onChildAdded(dbRef, function (data) {
+        const msg = data.val();
+        console.log(msg, "dataを取得");
+        let html = `
+            <p>${msg.uname}</p>
+            <p>${msg.text}</p>
+          `;
+        $("#output").append(html);
+        });
+    // Jquely
+</script>
+<!-- Firebase -->
+</body>
+</html>
